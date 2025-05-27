@@ -9,7 +9,7 @@ class TipoCreate(TipoBase):
     pass
 
 class Tipo(TipoBase):
-    id: int
+    codigo: int
 
     class Config:
         orm_mode = True
@@ -18,14 +18,12 @@ class Tipo(TipoBase):
 class PokemonBase(BaseModel):
     codigo: int
     nome: str
-    tipo_primario_id: int
-    tipo_secundario_id: Optional[int] = None
+    codigo_tipo_primario: int
+    codigo_tipo_secundario: Optional[int] = None
 
 class PokemonCreate(PokemonBase):
     pass
 
 class Pokemon(PokemonBase):
-    id: int
-
     class Config:
         orm_mode = True

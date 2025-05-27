@@ -4,18 +4,17 @@ from database import Base
 
 class Tipo(Base):
     __tablename__ = "tipos"
-    id = Column(Integer, primary_key=True, index=True)
+    codigo = Column(Integer, primary_key=True, index=True)
     nome = Column(String, unique=True, index=True)
 
 class Pokemon(Base):
     __tablename__ = "pokemons"
 
-    id = Column(Integer, primary_key=True, index=True)  # ID gerado automaticamente
-    codigo = Column(Integer, index=True)                # Apenas visual
+    codigo = Column(Integer, primary_key=True, index=True)  # Agora é a chave primária real
     nome = Column(String, index=True)
 
-    tipo_primario_id = Column(Integer, ForeignKey("tipos.id"))
-    tipo_secundario_id = Column(Integer, ForeignKey("tipos.id"), nullable=True)
+    codigo_tipo_primario = Column(Integer, ForeignKey("tipos.codigo"))
+    codigo_tipo_secundario = Column(Integer, ForeignKey("tipos.codigo"), nullable=True)
 
-    tipo_primario = relationship("Tipo", foreign_keys=[tipo_primario_id])
-    tipo_secundario = relationship("Tipo", foreign_keys=[tipo_secundario_id])
+    tipo_primario = relationship("Tipo", foreign_keys=[codigo_tipo_primario])
+    tipo_secundario = relationship("Tipo", foreign_keys=[codigo_tipo_secundario])

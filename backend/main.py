@@ -6,10 +6,9 @@ import models, crud, schemas
 
 app = FastAPI()
 
-# Liberação de CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # libera o front local
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -17,7 +16,6 @@ app.add_middleware(
 
 models.Base.metadata.create_all(bind=engine)
 
-# Dependência para obter a sessão do banco
 def get_db():
     db = SessionLocal()
     try:
@@ -38,7 +36,22 @@ def listar_tipos(db: Session = Depends(get_db)):
 def criar_tipo(tipo: schemas.TipoCreate, db: Session = Depends(get_db)):
     return crud.create_tipo(db, tipo)
 
-# Pokemons
+@app.put("/tipos/{codigo}", response_model=schemas.Tipo)
+def atualizar_tipo(codigo: int, dados: schemas.TipoCreate, db: Session = Depends(get_db)):
+    tipo_atualizado = crud.update_tipo(db, codigo, dados)
+    if not tipo_atualizado:
+        raise HTTPException(status_code=404, detail="Tipo não encontrado")
+    return tipo_atualizado
+
+@app.delete("/tipos/{codigo}")
+def deletar_tipo(codigo: int, db: Session = Depends(get_db)):
+    sucesso = crud.delete_tipo(db, codigo)
+    if not sucesso:
+        raise HTTPException(status_code=404, detail="Tipo não encontrado")
+    return {"ok": True}
+
+
+# Pokémons
 @app.get("/pokemons", response_model=list[schemas.Pokemon])
 def listar_pokemons(
     nome: str = Query(default=None),
@@ -51,12 +64,11 @@ def listar_pokemons(
         pokemons = pokemons.filter(models.Pokemon.nome.ilike(f"%{nome}%"))
 
     if tipo:
-        # Pega os tipos com esse nome
         tipo_encontrado = db.query(models.Tipo).filter(models.Tipo.nome == tipo).first()
         if tipo_encontrado:
             pokemons = pokemons.filter(
-                (models.Pokemon.tipo_primario_id == tipo_encontrado.id) |
-                (models.Pokemon.tipo_secundario_id == tipo_encontrado.id)
+                (models.Pokemon.codigo_tipo_primario == tipo_encontrado.codigo) |
+                (models.Pokemon.codigo_tipo_secundario == tipo_encontrado.codigo)
             )
 
     return pokemons.all()
@@ -65,9 +77,9 @@ def listar_pokemons(
 def criar_pokemon(pokemon: schemas.PokemonCreate, db: Session = Depends(get_db)):
     return crud.create_pokemon(db, pokemon)
 
-@app.put("/pokemons/{codigo}", response_model=schemas.Pokemon)
-def atualizar_pokemon(codigo: int, dados: schemas.PokemonCreate, db: Session = Depends(get_db)):
-    poke_atualizado = crud.update_pokemon(db, codigo, dados)
+@app.put("/pokemons/{codigo_antigo}", response_model=schemas.Pokemon)
+def atualizar_pokemon(codigo_antigo: int, dados: schemas.PokemonCreate, db: Session = Depends(get_db)):
+    poke_atualizado = crud.update_pokemon(db, codigo_antigo, dados)
     if not poke_atualizado:
         raise HTTPException(status_code=404, detail="Pokémon não encontrado")
     return poke_atualizado

@@ -1,16 +1,29 @@
 import { useEffect, useState } from 'react';
 import api from './services/api';
-import { getColorByType } from './utils/colors';
+import Filtro from './components/Filtro';
+import PokemonCard from './components/PokemonCard';
+import PokemonModal from './components/PokemonModal';
+import TipoModal from './components/TipoModal';
+import TipoLista from './components/TipoLista';
 
 function App() {
   const [pokemons, setPokemons] = useState([]);
-  const [tipos, setTipos] = useState({});
+  const [tipos, setTipos] = useState([]);
   const [buscaNome, setBuscaNome] = useState('');
   const [filtroTipo, setFiltroTipo] = useState('');
 
   const [modalAberto, setModalAberto] = useState(false);
   const [editando, setEditando] = useState(false);
-  const [novoPokemon, setNovoPokemon] = useState({ id: '', codigo: '', nome: '', tipoPrimario: '', tipoSecundario: '' });
+  const [codigoAntigo, setCodigoAntigo] = useState(null);
+  const [novoPokemon, setNovoPokemon] = useState({ codigo: '', nome: '', tipoPrimario: '', tipoSecundario: '' });
+
+  const [modalTipoAberto, setModalTipoAberto] = useState(false);
+  const [editandoTipo, setEditandoTipo] = useState(false);
+  const [codigoTipoAntigo, setCodigoTipoAntigo] = useState(null);
+  const [novoTipo, setNovoTipo] = useState('');
+
+  const [mostrarPokemons, setMostrarPokemons] = useState(false);
+  const [mostrarTipos, setMostrarTipos] = useState(false);
 
   useEffect(() => {
     carregarDados();
@@ -19,12 +32,7 @@ function App() {
   const carregarDados = async () => {
     try {
       const tiposRes = await api.get('/tipos');
-      const mapa = {};
-      tiposRes.data.forEach(t => {
-        mapa[t.id] = t.nome;
-      });
-      setTipos(mapa);
-
+      setTipos(tiposRes.data);
       const pokemonsRes = await api.get('/pokemons');
       setPokemons(pokemonsRes.data);
     } catch (err) {
@@ -39,36 +47,79 @@ function App() {
     }
 
     try {
+      const payload = {
+        codigo: parseInt(novoPokemon.codigo),
+        nome: novoPokemon.nome,
+        codigo_tipo_primario: parseInt(novoPokemon.tipoPrimario),
+        codigo_tipo_secundario: novoPokemon.tipoSecundario ? parseInt(novoPokemon.tipoSecundario) : null
+      };
+
       if (editando) {
-        await api.put(`/pokemons/${novoPokemon.id}`, {
-          codigo: parseInt(novoPokemon.codigo),
-          nome: novoPokemon.nome,
-          tipo_primario_id: parseInt(novoPokemon.tipoPrimario),
-          tipo_secundario_id: novoPokemon.tipoSecundario ? parseInt(novoPokemon.tipoSecundario) : null
-        });
+        if (parseInt(novoPokemon.codigo) !== codigoAntigo) {
+          await api.delete(`/pokemons/${codigoAntigo}`);
+          await api.post('/pokemons', payload);
+        } else {
+          await api.put(`/pokemons/${codigoAntigo}`, payload);
+        }
       } else {
-        await api.post('/pokemons', {
-          codigo: parseInt(novoPokemon.codigo),
-          nome: novoPokemon.nome,
-          tipo_primario_id: parseInt(novoPokemon.tipoPrimario),
-          tipo_secundario_id: novoPokemon.tipoSecundario ? parseInt(novoPokemon.tipoSecundario) : null
-        });
+        await api.post('/pokemons', payload);
       }
 
       await carregarDados();
-      setNovoPokemon({ id: '', codigo: '', nome: '', tipoPrimario: '', tipoSecundario: '' });
-      setModalAberto(false);
-      setEditando(false);
+      resetarForm();
     } catch (err) {
       console.error("Erro ao salvar Pokémon:", err);
       alert("Erro: " + (err.response?.data?.detail || err.message));
     }
   };
 
-  const handleExcluir = async (id) => {
+  const handleCadastrarTipo = async () => {
+    if (!novoTipo.trim()) {
+      alert("O nome do tipo é obrigatório.");
+      return;
+    }
+
+    try {
+      if (editandoTipo && codigoTipoAntigo !== null) {
+        await api.put(`/tipos/${codigoTipoAntigo}`, { nome: novoTipo.trim() });
+      } else {
+        await api.post('/tipos', { nome: novoTipo.trim() });
+      }
+
+      await carregarDados();
+      setNovoTipo('');
+      setModalTipoAberto(false);
+      setEditandoTipo(false);
+      setCodigoTipoAntigo(null);
+    } catch (err) {
+      console.error("Erro ao salvar Tipo:", err);
+      alert("Erro: " + (err.response?.data?.detail || err.message));
+    }
+  };
+
+  const resetarForm = () => {
+    setNovoPokemon({ codigo: '', nome: '', tipoPrimario: '', tipoSecundario: '' });
+    setModalAberto(false);
+    setEditando(false);
+    setCodigoAntigo(null);
+  };
+
+  const handleEditar = (poke) => {
+    setCodigoAntigo(poke.codigo);
+    setNovoPokemon({
+      codigo: poke.codigo,
+      nome: poke.nome,
+      tipoPrimario: poke.codigo_tipo_primario,
+      tipoSecundario: poke.codigo_tipo_secundario || ''
+    });
+    setEditando(true);
+    setModalAberto(true);
+  };
+
+  const handleExcluir = async (codigo) => {
     if (!window.confirm("Tem certeza que deseja excluir este Pokémon?")) return;
     try {
-      await api.delete(`/pokemons/${id}`);
+      await api.delete(`/pokemons/${codigo}`);
       await carregarDados();
     } catch (err) {
       console.error("Erro ao excluir:", err);
@@ -76,22 +127,28 @@ function App() {
     }
   };
 
-  const handleEditar = (poke) => {
-    setNovoPokemon({
-      id: poke.id,
-      codigo: poke.codigo,
-      nome: poke.nome,
-      tipoPrimario: poke.tipo_primario_id,
-      tipoSecundario: poke.tipo_secundario_id || ''
-    });
-    setEditando(true);
-    setModalAberto(true);
+  const handleEditarTipo = (tipo) => {
+    setNovoTipo(tipo.nome);
+    setCodigoTipoAntigo(tipo.codigo);
+    setEditandoTipo(true);
+    setModalTipoAberto(true);
+  };
+
+  const handleExcluirTipo = async (codigo) => {
+    if (!window.confirm("Tem certeza que deseja excluir este tipo?")) return;
+    try {
+      await api.delete(`/tipos/${codigo}`);
+      await carregarDados();
+    } catch (err) {
+      console.error("Erro ao excluir tipo:", err);
+      alert("Erro ao excluir tipo: " + (err.response?.data?.detail || err.message));
+    }
   };
 
   const pokemonsFiltrados = pokemons.filter(poke => {
     const nomeInclui = poke.nome.toLowerCase().includes(buscaNome.toLowerCase());
-    const tipoPrimario = tipos[poke.tipo_primario_id];
-    const tipoSecundario = tipos[poke.tipo_secundario_id];
+    const tipoPrimario = tipos.find(t => t.codigo === poke.codigo_tipo_primario)?.nome;
+    const tipoSecundario = tipos.find(t => t.codigo === poke.codigo_tipo_secundario)?.nome;
     const tipoSelecionado = filtroTipo.toLowerCase();
 
     const correspondeTipo =
@@ -106,151 +163,85 @@ function App() {
     <div>
       <h1 style={{ textAlign: 'center', margin: '20px 0' }}>Pokédex</h1>
 
+      <Filtro
+        buscaNome={buscaNome}
+        setBuscaNome={setBuscaNome}
+        filtroTipo={filtroTipo}
+        setFiltroTipo={setFiltroTipo}
+        tipos={tipos}
+      />
+
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <input
-          type="text"
-          placeholder="Buscar por nome..."
-          value={buscaNome}
-          onChange={(e) => setBuscaNome(e.target.value)}
-          style={{
-            padding: '8px 12px', fontSize: '16px', borderRadius: '8px', border: '1px solid #ccc', width: '250px', marginRight: '10px'
-          }}
-        />
-
-        <select
-          value={filtroTipo}
-          onChange={(e) => setFiltroTipo(e.target.value)}
-          style={{
-            padding: '8px 12px', fontSize: '16px', borderRadius: '8px', border: '1px solid #ccc', width: '180px', marginRight: '10px'
-          }}
-        >
-          <option value="">Todos os tipos</option>
-          {Object.values(tipos).map(tipo => (
-            <option key={tipo} value={tipo}>{tipo}</option>
-          ))}
-        </select>
-
-        <button
-          onClick={() => {
-            setModalAberto(true);
-            setEditando(false);
-            setNovoPokemon({ id: '', codigo: '', nome: '', tipoPrimario: '', tipoSecundario: '' });
-          }}
-          style={{
-            padding: '8px 16px', fontSize: '16px', borderRadius: '8px', backgroundColor: '#4CAF50', color: 'white', border: 'none'
-          }}
-        >
+        <button onClick={() => {
+          setModalAberto(true);
+          setEditando(false);
+          setCodigoAntigo(null);
+          setNovoPokemon({ codigo: '', nome: '', tipoPrimario: '', tipoSecundario: '' });
+        }} style={{ padding: '8px 16px', fontSize: '16px', borderRadius: '8px', backgroundColor: '#4CAF50', color: 'white', border: 'none', marginRight: '10px' }}>
           Cadastrar Pokémon
+        </button>
+
+        <button onClick={() => setModalTipoAberto(true)}
+          style={{ padding: '8px 16px', fontSize: '16px', borderRadius: '8px', backgroundColor: '#2196F3', color: 'white', border: 'none', marginRight: '10px' }}>
+          Cadastrar Tipo
+        </button>
+
+        <button onClick={() => { setMostrarPokemons(true); setMostrarTipos(false); }}
+          style={{ padding: '8px 16px', fontSize: '16px', borderRadius: '8px', backgroundColor: '#9C27B0', color: 'white', border: 'none', marginRight: '10px' }}>
+          Listar Pokémons
+        </button>
+
+        <button onClick={() => { setMostrarPokemons(false); setMostrarTipos(true); }}
+          style={{ padding: '8px 16px', fontSize: '16px', borderRadius: '8px', backgroundColor: '#FF9800', color: 'white', border: 'none' }}>
+          Listar Tipos
         </button>
       </div>
 
-      {modalAberto && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-          backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 9999
-        }}>
-          <div style={{ background: 'white', padding: '24px', borderRadius: '12px', width: '320px' }}>
-            <h2>{editando ? 'Editar Pokémon' : 'Novo Pokémon'}</h2>
+      <PokemonModal
+        aberto={modalAberto}
+        editando={editando}
+        novoPokemon={novoPokemon}
+        setNovoPokemon={setNovoPokemon}
+        tipos={tipos}
+        onFechar={resetarForm}
+        onSalvar={handleCadastrar}
+      />
 
-            <label>Código*:<br/>
-              <input
-                type="number"
-                value={novoPokemon.codigo}
-                onChange={(e) => setNovoPokemon({ ...novoPokemon, codigo: e.target.value })}
-                style={{ width: '100%', padding: '8px', marginBottom: '12px' }}
-              />
-            </label>
+      <TipoModal
+        aberto={modalTipoAberto}
+        editando={editandoTipo}
+        novoTipo={novoTipo}
+        setNovoTipo={setNovoTipo}
+        onFechar={() => {
+          setModalTipoAberto(false);
+          setNovoTipo('');
+          setEditandoTipo(false);
+          setCodigoTipoAntigo(null);
+        }}
+        onSalvar={handleCadastrarTipo}
+      />
 
-            <label>Nome*:<br/>
-              <input
-                type="text"
-                value={novoPokemon.nome}
-                onChange={(e) => setNovoPokemon({ ...novoPokemon, nome: e.target.value })}
-                style={{ width: '100%', padding: '8px', marginBottom: '12px' }}
-              />
-            </label>
-
-            <label>Tipo Primário*:<br/>
-              <select
-                value={novoPokemon.tipoPrimario}
-                onChange={(e) => setNovoPokemon({ ...novoPokemon, tipoPrimario: e.target.value })}
-                style={{ width: '100%', padding: '8px', marginBottom: '12px' }}
-              >
-                <option value="">Selecione...</option>
-                {Object.entries(tipos).map(([id, nome]) => (
-                  <option key={id} value={id}>{nome}</option>
-                ))}
-              </select>
-            </label>
-
-            <label>Tipo Secundário (opcional):<br/>
-              <select
-                value={novoPokemon.tipoSecundario}
-                onChange={(e) => setNovoPokemon({ ...novoPokemon, tipoSecundario: e.target.value })}
-                style={{ width: '100%', padding: '8px', marginBottom: '16px' }}
-              >
-                <option value="">Nenhum</option>
-                {Object.entries(tipos).map(([id, nome]) => (
-                  <option key={id} value={id}>{nome}</option>
-                ))}
-              </select>
-            </label>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-              <button onClick={() => { setModalAberto(false); setEditando(false); }} style={{ padding: '8px 12px' }}>Cancelar</button>
-              <button onClick={handleCadastrar} style={{ padding: '8px 12px', backgroundColor: '#4CAF50', color: 'white', border: 'none' }}>
-                {editando ? 'Salvar Alterações' : 'Salvar'}
-              </button>
-            </div>
-          </div>
+      {mostrarPokemons && (
+        <div className="pokemon-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', padding: '0 1rem' }}>
+          {pokemonsFiltrados.map(poke => (
+            <PokemonCard
+              key={poke.codigo}
+              poke={poke}
+              tipos={tipos}
+              onEditar={handleEditar}
+              onExcluir={handleExcluir}
+            />
+          ))}
         </div>
       )}
 
-      <div
-        className="pokemon-grid"
-        style={{
-          display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-          gap: '1rem', padding: '0 1rem'
-        }}
-      >
-        {pokemonsFiltrados.map(poke => {
-          const tipoPrimario = tipos[poke.tipo_primario_id];
-          const tipoSecundario = tipos[poke.tipo_secundario_id];
-
-          return (
-            <div
-              key={poke.codigo}
-              style={{
-                backgroundColor: getColorByType(tipoPrimario),
-                color: 'white', padding: '16px', borderRadius: '10px', boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-                position: 'relative'
-              }}
-            >
-              <button
-                onClick={() => handleExcluir(poke.id)}
-                style={{
-                  position: 'absolute', top: '8px', right: '8px', background: 'transparent', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '18px', cursor: 'pointer'
-                }}
-              >
-                ❌
-              </button>
-              <button
-                onClick={() => handleEditar(poke)}
-                style={{
-                  position: 'absolute', top: '8px', left: '8px', background: 'transparent', color: 'white', border: 'none', fontSize: '18px', cursor: 'pointer'
-                }}
-              >
-                ✏️
-              </button>
-              <p style={{ fontSize: '12px', marginTop: '28px', marginBottom: '4px' }}>Código: {poke.codigo}</p>
-              <h2 style={{ fontSize: '18px', fontWeight: 'bold' }}>{poke.nome}</h2>
-              <p>Tipo Primário: {tipoPrimario}</p>
-              {tipoSecundario && <p>Tipo Secundário: {tipoSecundario}</p>}
-            </div>
-          );
-        })}
-      </div>
+      {mostrarTipos && (
+        <TipoLista
+          tipos={tipos}
+          onEditar={handleEditarTipo}
+          onExcluir={handleExcluirTipo}
+        />
+      )}
     </div>
   );
 }
