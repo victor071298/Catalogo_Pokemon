@@ -20,16 +20,18 @@ O projeto pode ser executado de duas formas:
 
 #### Requisitos:
 - Docker e Docker Compose instalados
+- Git instalado
 
 #### Passos:
 1. Clone o repositório:
    git clone https://github.com/victor071298/Catalogo_Pokemon.git
+   
    cd Catalogo_Pokemon
 
-2. Rode os serviços com Docker Compose:
+3. Rode os serviços com Docker Compose:
    docker-compose up --build
 
-3. Acesse no navegador:
+4. Acesse no navegador:
 - Frontend com Catálogo: http://localhost:3000
 - Backend API dos Pokémons: http://localhost:8000/pokemons
 - Backend Api dos Tipos: http://localhost:8000/tipos
@@ -42,6 +44,12 @@ O projeto pode ser executado de duas formas:
 #### Requisitos:
 - Python 3.11 instalado
 - Node.js + npm instalados
+- Git instalado
+
+#### Clonando o repositório com Git:
+   git clone https://github.com/victor071298/Catalogo_Pokemon.git
+   
+   cd Catalogo_Pokemon
 
 #### Backend (FastAPI):
 
