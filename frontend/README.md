@@ -49,8 +49,8 @@ Obs: O código deve ser rodado na raiz do projeto, "Catalogo_Pokemon" e não da 
 4. Acesse no navegador:
    http://localhost:5173
 
-> **Importância do `npm install` antes**  
-> Esse comando instala todas as dependências listadas no `package.json`, como React, Axios, Vite e outras bibliotecas usadas na interface.
+**Importância do `npm install` antes**:  
+Esse comando instala todas as dependências listadas no `package.json`, como React, Axios, Vite e outras bibliotecas usadas na interface.
 
 ---
 
