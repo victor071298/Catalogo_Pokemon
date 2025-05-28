@@ -24,8 +24,9 @@ O projeto pode ser executado de duas formas:
 
 #### Passos:
 1. Clone o repositório:
-   -git clone https://github.com/victor071298/Catalogo_Pokemon.git
-   -cd Catalogo_Pokemon
+git clone https://github.com/victor071298/Catalogo_Pokemon.git
+
+cd Catalogo_Pokemon
 
 3. Rode os serviços com Docker Compose:
    docker-compose up --build
@@ -46,8 +47,9 @@ O projeto pode ser executado de duas formas:
 - Git instalado
 
 #### Clonando o repositório com Git:
-   -git clone https://github.com/victor071298/Catalogo_Pokemon.git
-   -cd Catalogo_Pokemon
+git clone https://github.com/victor071298/Catalogo_Pokemon.git
+
+cd Catalogo_Pokemon
 
 #### Backend (FastAPI):
 
