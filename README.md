@@ -24,6 +24,7 @@ O projeto pode ser executado de duas formas:
 
 #### Passos:
 1. Clone o repositório:
+
 git clone https://github.com/victor071298/Catalogo_Pokemon.git
 
 cd Catalogo_Pokemon
