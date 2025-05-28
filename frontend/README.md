@@ -27,6 +27,7 @@ Você pode rodar o frontend com ou sem Docker:
    http://localhost:3000
    
 Obs: O código deve ser rodado na raiz do projeto, "Catalogo_Pokemon" e não da pasta do frontend. Além disso, sem o backend ativo, a página não é capaz de acessar o banco de dados, sendo incapaz de realizar suas funcionalidades.
+
 ---
 
 ### Rodando manualmente
