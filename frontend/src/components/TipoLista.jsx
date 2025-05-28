@@ -1,10 +1,13 @@
 import { getColorByType } from '../utils/colors';
 
 function TipoLista({ tipos, onEditar, onExcluir }) {
+  // Se não houver tipos cadastrados, exibe a mensagem
   if (!tipos || tipos.length === 0) return <p style={{ textAlign: 'center' }}>Nenhum tipo cadastrado.</p>;
 
   return (
     <div style={{ padding: '1rem', textAlign: 'center' }}>
+
+      {/* Lista não ordenada*/}
       <h2 style={{ marginBottom: '1rem' }}>Tipos cadastrados</h2>
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {tipos.map(tipo => (
@@ -19,6 +22,7 @@ function TipoLista({ tipos, onEditar, onExcluir }) {
               gap: '10px'
             }}
           >
+            {/* Bolinha colorida representando o tipo */}
             <span
               style={{
                 display: 'inline-block',
@@ -28,13 +32,16 @@ function TipoLista({ tipos, onEditar, onExcluir }) {
                 backgroundColor: getColorByType(tipo.nome)
               }}
             />
-            <strong>{tipo.nome}</strong> (Código: {tipo.codigo})
+            {/* Nome do tipo */}
+            <strong>{tipo.nome}</strong>
 
+             {/* Botão para editar tipo */}
             <button
               onClick={() => onEditar(tipo)}
               style={{ marginLeft: '10px', background: 'transparent', border: 'none', cursor: 'pointer' }}
             >✏️</button>
 
+            {/* Botão para excluir tipo */}
             <button
               onClick={() => onExcluir(tipo.codigo)}
               style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}

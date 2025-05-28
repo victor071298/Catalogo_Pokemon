@@ -7,6 +7,7 @@ function PokemonModal({
   onFechar,
   onSalvar
 }) {
+  // Se o modal não estiver aberto, não renderiza nad
   if (!aberto) return null;
 
   return (
@@ -18,6 +19,8 @@ function PokemonModal({
       <div style={{ background: 'white', padding: '24px', borderRadius: '12px', width: '320px' }}>
         <h2>{editando ? 'Editar Pokémon' : 'Novo Pokémon'}</h2>
 
+        {/* Campo Código: só pode ser editado no modo criação, no modo edição não aparece */}
+        {!editando && (
         <label>Código*:<br />
           <input
             type="number"
@@ -26,7 +29,9 @@ function PokemonModal({
             style={{ width: '100%', padding: '8px', marginBottom: '12px' }}
           />
         </label>
+        )}
 
+        {/* Campo Nome */}
         <label>Nome*:<br />
           <input
             type="text"
@@ -36,6 +41,7 @@ function PokemonModal({
           />
         </label>
 
+        {/* Select de Tipo Primário */}
         <label>Tipo Primário*:<br />
           <select
             value={novoPokemon.tipoPrimario}
@@ -49,6 +55,7 @@ function PokemonModal({
           </select>
         </label>
 
+        {/* Select de Tipo Secundário */}
         <label>Tipo Secundário (opcional):<br />
           <select
             value={novoPokemon.tipoSecundario}
@@ -62,6 +69,9 @@ function PokemonModal({
           </select>
         </label>
 
+        <h5>* Campo obrigatório</h5>
+        
+        {/* Botões do modal */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
           <button onClick={onFechar} style={{ padding: '8px 12px' }}>Cancelar</button>
           <button

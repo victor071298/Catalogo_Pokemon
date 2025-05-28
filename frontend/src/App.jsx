@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import api from './services/api';
+import api from './services/api'; // serviço que comunica com o backend
 import Filtro from './components/Filtro';
 import PokemonCard from './components/PokemonCard';
 import PokemonModal from './components/PokemonModal';
@@ -7,28 +7,36 @@ import TipoModal from './components/TipoModal';
 import TipoLista from './components/TipoLista';
 
 function App() {
+  // Lista de pokémons e tipos vindos da API
   const [pokemons, setPokemons] = useState([]);
   const [tipos, setTipos] = useState([]);
+
+  // Filtros de busca
   const [buscaNome, setBuscaNome] = useState('');
   const [filtroTipo, setFiltroTipo] = useState('');
-
+ 
+  // Controle do modal de Pokémon
   const [modalAberto, setModalAberto] = useState(false);
   const [editando, setEditando] = useState(false);
   const [codigoAntigo, setCodigoAntigo] = useState(null);
   const [novoPokemon, setNovoPokemon] = useState({ codigo: '', nome: '', tipoPrimario: '', tipoSecundario: '' });
 
+  // Controle do modal de Tipo
   const [modalTipoAberto, setModalTipoAberto] = useState(false);
   const [editandoTipo, setEditandoTipo] = useState(false);
   const [codigoTipoAntigo, setCodigoTipoAntigo] = useState(null);
   const [novoTipo, setNovoTipo] = useState('');
 
+  // Controle de qual lista será exibida (Pokémons ou Tipos)
   const [mostrarPokemons, setMostrarPokemons] = useState(false);
   const [mostrarTipos, setMostrarTipos] = useState(false);
 
+  // Executa ao montar o componente: carrega os dados da API
   useEffect(() => {
     carregarDados();
   }, []);
 
+  // Função que busca pokémons e tipos no backend
   const carregarDados = async () => {
     try {
       const tiposRes = await api.get('/tipos');
@@ -40,6 +48,7 @@ function App() {
     }
   };
 
+  // Lógica de cadastro ou atualização de Pokémon
   const handleCadastrar = async () => {
     if (!novoPokemon.nome || !novoPokemon.tipoPrimario || !novoPokemon.codigo) {
       alert("Preencha os campos obrigatórios.");
@@ -55,24 +64,20 @@ function App() {
       };
 
       if (editando) {
-        if (parseInt(novoPokemon.codigo) !== codigoAntigo) {
-          await api.delete(`/pokemons/${codigoAntigo}`);
-          await api.post('/pokemons', payload);
-        } else {
-          await api.put(`/pokemons/${codigoAntigo}`, payload);
-        }
+        await api.put(`/pokemons/${codigoAntigo}`, payload);
       } else {
         await api.post('/pokemons', payload);
       }
 
-      await carregarDados();
-      resetarForm();
+      await carregarDados(); // atualiza a lista após salva
+      resetarForm(); // fecha o modal e limpa os campos
     } catch (err) {
       console.error("Erro ao salvar Pokémon:", err);
       alert("Erro: " + (err.response?.data?.detail || err.message));
     }
   };
 
+  // Lógica de cadastro ou atualização de Tipo
   const handleCadastrarTipo = async () => {
     if (!novoTipo.trim()) {
       alert("O nome do tipo é obrigatório.");
@@ -97,6 +102,7 @@ function App() {
     }
   };
 
+  // Reseta o formulário do Pokémon (fecha o modal)
   const resetarForm = () => {
     setNovoPokemon({ codigo: '', nome: '', tipoPrimario: '', tipoSecundario: '' });
     setModalAberto(false);
@@ -104,6 +110,7 @@ function App() {
     setCodigoAntigo(null);
   };
 
+  // Preenche os dados do Pokémon no modal para edição
   const handleEditar = (poke) => {
     setCodigoAntigo(poke.codigo);
     setNovoPokemon({
@@ -116,6 +123,7 @@ function App() {
     setModalAberto(true);
   };
 
+  // Exclui Pokémon por código
   const handleExcluir = async (codigo) => {
     if (!window.confirm("Tem certeza que deseja excluir este Pokémon?")) return;
     try {
@@ -127,6 +135,7 @@ function App() {
     }
   };
 
+  // Preenche os dados do tipo no modal para edição
   const handleEditarTipo = (tipo) => {
     setNovoTipo(tipo.nome);
     setCodigoTipoAntigo(tipo.codigo);
@@ -134,6 +143,7 @@ function App() {
     setModalTipoAberto(true);
   };
 
+  // Exclui Tipo
   const handleExcluirTipo = async (codigo) => {
     if (!window.confirm("Tem certeza que deseja excluir este tipo?")) return;
     try {
@@ -145,6 +155,7 @@ function App() {
     }
   };
 
+  // Filtra os pokémons pelo nome e pelo tipo escolhido
   const pokemonsFiltrados = pokemons.filter(poke => {
     const nomeInclui = poke.nome.toLowerCase().includes(buscaNome.toLowerCase());
     const tipoPrimario = tipos.find(t => t.codigo === poke.codigo_tipo_primario)?.nome;
@@ -159,10 +170,12 @@ function App() {
     return nomeInclui && correspondeTipo;
   });
 
+  // Renderiza toda a aplicação
   return (
     <div>
       <h1 style={{ textAlign: 'center', margin: '20px 0' }}>Pokédex</h1>
 
+       {/* Filtro de busca */}
       <Filtro
         buscaNome={buscaNome}
         setBuscaNome={setBuscaNome}
@@ -171,7 +184,9 @@ function App() {
         tipos={tipos}
       />
 
+      {/* Botões de ações principais */}
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+         {/* Abre modal para novo Pokémon */}
         <button onClick={() => {
           setModalAberto(true);
           setEditando(false);
@@ -181,11 +196,13 @@ function App() {
           Cadastrar Pokémon
         </button>
 
+        {/* Abre modal de novo tipo */}
         <button onClick={() => setModalTipoAberto(true)}
           style={{ padding: '8px 16px', fontSize: '16px', borderRadius: '8px', backgroundColor: '#2196F3', color: 'white', border: 'none', marginRight: '10px' }}>
           Cadastrar Tipo
         </button>
 
+        {/* Alternância de visualização */}
         <button onClick={() => { setMostrarPokemons(true); setMostrarTipos(false); }}
           style={{ padding: '8px 16px', fontSize: '16px', borderRadius: '8px', backgroundColor: '#9C27B0', color: 'white', border: 'none', marginRight: '10px' }}>
           Listar Pokémons
@@ -197,6 +214,7 @@ function App() {
         </button>
       </div>
 
+      {/* Modal de Pokémon */} 
       <PokemonModal
         aberto={modalAberto}
         editando={editando}
@@ -207,6 +225,7 @@ function App() {
         onSalvar={handleCadastrar}
       />
 
+      {/*Modal de Tipo */}
       <TipoModal
         aberto={modalTipoAberto}
         editando={editandoTipo}
@@ -221,6 +240,7 @@ function App() {
         onSalvar={handleCadastrarTipo}
       />
 
+      {/* Lista de Pokémons */}
       {mostrarPokemons && (
         <div className="pokemon-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem', padding: '0 1rem' }}>
           {pokemonsFiltrados.map(poke => (
@@ -235,6 +255,7 @@ function App() {
         </div>
       )}
 
+      {/* Lista de Tipos */}
       {mostrarTipos && (
         <TipoLista
           tipos={tipos}

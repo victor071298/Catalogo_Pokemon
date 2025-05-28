@@ -6,6 +6,7 @@ function TipoModal({
   onFechar,
   onSalvar
 }) {
+  // Se o modal não estiver aberto, não renderiza nada (não aparece na tela)
   if (!aberto) return null;
 
   return (
@@ -27,8 +28,9 @@ function TipoModal({
         borderRadius: '12px',
         width: '320px'
       }}>
+        {/* Título do modal muda dependendo se está criando ou editando */}
         <h2>{editando ? 'Editar Tipo' : 'Novo Tipo'}</h2>
-
+        {/* Campo de texto para digitar o nome do tipo */}
         <label>Nome do Tipo*:<br />
           <input
             type="text"
@@ -38,6 +40,9 @@ function TipoModal({
           />
         </label>
 
+        <h5>* Campo obrigatório</h5>
+        
+        {/* Botões no rodapé do modal */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
           <button onClick={onFechar} style={{ padding: '8px 12px' }}>Cancelar</button>
           <button
