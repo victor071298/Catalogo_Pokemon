@@ -7,10 +7,10 @@ import models, crud, schemas
 # Inicializa o app FastAPI
 app = FastAPI()
 
-# Configuração de CORS para permitir acesso do frontend (localhost:5173)
+# Configuração de CORS para permitir acesso do frontend (localhost:5173 para dev e localhost:3000 no docker)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173","http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

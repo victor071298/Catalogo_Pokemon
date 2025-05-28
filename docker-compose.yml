@@ -1,0 +1,26 @@
+# Versão da sintaxe do Docker Compose
+version: "3.8"
+
+# Definição dos serviços (containers) que o Docker vai rodar
+services:
+  # Serviço do backend (FastAPI)
+  backend:
+    # Diretório base para o build (raiz do projeto)
+    build:
+      context: .
+      dockerfile: backend/Dockerfile  # Caminho do Dockerfile específico
+    ports:
+      - "8000:8000"  # Mapeia porta local 8000 para a porta do container (FastAPI)
+    volumes:
+      - ./backend:/app  # Sincroniza o código local com o container
+    restart: always  # Reinicia o container automaticamente se ele parar
+
+  # Serviço do frontend (React + Vite)
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile  # Caminho do Dockerfile do frontend
+    ports:
+      - "3000:3000"  # Mapeia porta local 3000 para a porta do container (React)
+    volumes:
+      - ./frontend:/app  # Sincroniza o código local com o container
