@@ -24,7 +24,6 @@ Passos:
    docker run -p 8000:8000 pokedex-backend
 
 3. Acesse no navegador:
-
    http://localhost:8000/pokemons - Lista de Pokémons  
    http://localhost:8000/tipos - Tipos de Pokémons  
    http://localhost:8000/docs - Documentação Swagger da API
