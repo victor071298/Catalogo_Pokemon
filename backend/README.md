@@ -17,11 +17,10 @@ Pré-requisitos:
 
 Passos:
 
-1. Acesse a pasta do backend:
-   cd backend
+1. Em Catalogo_Pokemon construa o container:
+   docker build -f backend/Dockerfile -t pokedex-backend .
 
 2. Rode o container:
-   docker build -t pokedex-backend .
    docker run -p 8000:8000 pokedex-backend
 
 3. Acesse no navegador:
@@ -29,6 +28,7 @@ Passos:
    http://localhost:8000/tipos - Tipos de Pokémons  
    http://localhost:8000/docs - Documentação Swagger da API
 
+Obs: O código deve ser rodado na raiz do projeto, "Catalogo_Pokemon" e *não* da pasta do backend.
 ---
 
 ### Rodando sem Docker
