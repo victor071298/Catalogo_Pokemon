@@ -17,16 +17,16 @@ Você pode rodar o frontend com ou sem Docker:
 
 #### Passos:
 
-1. Acesse a pasta do frontend:
-   cd frontend
+1. Em Catalogo_Pokemon construa o container:
+   docker build -f frontend/Dockerfile -t pokedex-frontend .
 
 2. Rode o container:
-   docker build -t pokedex-frontend .
    docker run -p 3000:3000 pokedex-frontend
 
 3. Acesse no navegador:
    http://localhost:3000
-
+   
+Obs: O código deve ser rodado na raiz do projeto, "Catalogo_Pokemon" e não da pasta do frontend. Além disso, sem o backend ativo, a página não é capaz de acessar o banco de dados, sendo incapaz de realizar suas funcionalidades.
 ---
 
 ### Rodando manualmente
