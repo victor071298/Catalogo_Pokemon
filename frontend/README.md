@@ -1,12 +1,58 @@
-# React + Vite
+# Frontend – Catalogo_Pokemon
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este é o frontend da Catálogo Pokémon, desenvolvido com **React** e **Vite**. Ele consome a API desenvolvida em FastAPI e exibe os Pokémons e os tipos dos Pokémons com filtros, listagem e operações de edição e remoção.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Como rodar o frontend
 
-## Expanding the ESLint configuration
+Você pode rodar o frontend com ou sem Docker:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+### Usando Docker (recomendado)
+
+#### Pré-requisitos:
+- Docker instalado
+
+#### Passos:
+
+1. Acesse a pasta do frontend:
+   cd frontend
+
+2. Rode o container:
+   docker build -t pokedex-frontend .
+   docker run -p 3000:3000 pokedex-frontend
+
+3. Acesse no navegador:
+   http://localhost:3000
+
+---
+
+### Rodando manualmente
+
+#### Pré-requisitos:
+- Node.js e npm instalados
+
+#### Passos:
+
+1. Acesse a pasta do frontend:
+   cd frontend
+
+2. Instale as dependências:
+   npm install
+
+3. Inicie o servidor de desenvolvimento:
+   npm run dev
+
+4. Acesse no navegador:
+   http://localhost:5173
+
+> **Importância do `npm install` antes**  
+> Esse comando instala todas as dependências listadas no `package.json`, como React, Axios, Vite e outras bibliotecas usadas na interface.
+
+---
+
+## Comunicação com o Backend
+
+O frontend consome a API em FastAPI. Certifique-se de que o endereço da API esteja correto em `frontend/src/services/api.js`(normalmente http://localhost:8000 quando rodando localmente).
