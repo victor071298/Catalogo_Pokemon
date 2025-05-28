@@ -53,12 +53,17 @@ git clone https://github.com/victor071298/Catalogo_Pokemon.git
 cd Catalogo_Pokemon
 
 #### Backend (FastAPI):
+A partir da pasta Catalogo_Pokemon:
 
-cd backend  
-python -m venv venv  
+cd backend
+
+opcional: 
+python -m venv venv
 venv\Scripts\activate (Windows)  
 source venv/bin/activate (Linux/macOS)  
+
 pip install -r requirements.txt  
+
 uvicorn main:app --reload
 
 - Backend API dos Pokémons: http://localhost:8000/pokemons
@@ -66,9 +71,12 @@ uvicorn main:app --reload
 - Documentação Swagger: http://localhost:8000/docs
 
 #### Frontend (React + Vite):
+A partir da pasta Catalogo_Pokemon:
 
 cd frontend  
-npm install  
+
+npm install
+
 npm run dev
 
 - Frontend com Catálogo: http://localhost:5173
