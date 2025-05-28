@@ -1,6 +1,6 @@
 # Backend – Catalogo_Pokemon
 
-O backend foi desenvolvido em **FastAPI** com banco de dados **SQLite**.
+Este é o backend do Catálogo Pokémon, desenvolvido em **FastAPI** com banco de dados **SQLite**.
 
 ---
 
