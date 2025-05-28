@@ -87,3 +87,6 @@ Se necessário, edite o arquivo `frontend/src/services/api.js` para garantir que
 /backend - API em FastAPI com SQLite  
 /frontend - Interface em React  
 /docker-compose.yml - Orquestração dos containers frontend + backend
+
+# Vídeo no Youtube demonstrando as funcionalidades do frontend
+https://youtu.be/IyeZ-74FmUE
