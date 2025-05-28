@@ -29,6 +29,7 @@ Passos:
    http://localhost:8000/docs - Documentação Swagger da API
 
 Obs: O código deve ser rodado na raiz do projeto, "Catalogo_Pokemon" e *não* da pasta do backend.
+
 ---
 
 ### Rodando sem Docker
